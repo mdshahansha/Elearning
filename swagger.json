@@ -1,0 +1,608 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "description": "API for E-commerce application",
+    "title": "E-Learning Platfrom API"
+  },
+  "servers": [
+    {
+      "url": "https://e-learning-backend-production-3d18.up.railway.app/",
+      "description": "API for E-commerce application - \nURL for testing on hosted link"
+    },
+    {
+      "url": "http://localhost:3400",
+      "description": "API for E-commerce application - \nURL for testing in local"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "JWT": {
+        "in": "header",
+        "name": "Authorization",
+        "type": "apiKey"
+      }
+    }
+  },
+  "paths": {
+    "/api/user/signIn": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Log-in",
+        "description": "Providing correct credential will get you jwt token for making requets on secured route",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "email": "example@example.com",
+                  "password": "newpassword11@@"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token Sent - VALID for only 1hr"
+          },
+          "400": {
+            "description": "Incorrect Credentials"
+          },
+          "404": {
+            "description": "This email does not exists"
+          },
+          "500": {
+            "description": "The server has encountered a situation it does not know how to handle."
+          }
+        }
+      }
+    },
+    "/api/user/signUp": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Sign-up",
+        "description": "Create user - with given mail, username and password,\nEmail and username are needed to be unique,\n Passowrd should contain at least one special character and minimum length 8",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "email": "example@example.com",
+                  "username": "example_user_id",
+                  "password": "123456789@@"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Description of the specific error"
+                    }
+                  }
+                },
+                "examples": {
+                  "PasswordError": {
+                    "value": {
+                      "error": "Password must be at least 8 characters long and contain at least 1 special character"
+                    }
+                  },
+                  "EmailError": {
+                    "value": {
+                      "error": "Incorrect Email format"
+                    }
+                  },
+                  "UsernameError": {
+                    "value": {
+                      "error": "Username must be at least 3 characters long"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "User created successfuly"
+          },
+          "409": {
+            "description": "User with this, already exists"
+          },
+          "500": {
+            "description": "The server has encountered a situation it does not know how to handle."
+          }
+        }
+      }
+    },
+    "/api/user/getUserDetails/": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get all user details",
+        "security": [{ "JWT": {} }],
+        "description": "Get all user details",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "The server has encountered a situation it does not know how to handle."
+          }
+        }
+      }
+    },
+    "/api/user/updateDetails/": {
+      "put": {
+        "tags": ["User"],
+        "summary": "Update user details",
+        "security": [{ "JWT": {} }],
+        "description": "Update user details",
+
+        "requestBody": {
+          "description": "Pass only what you want to update, i.e., you can pass either username or email or both.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "newUsername": {
+                    "type": ["string", " null"],
+                    "description": "New username to update (optional)"
+                  },
+                  "newEmail": {
+                    "type": ["string", " null"],
+                    "description": "New email to update (optional)"
+                  }
+                },
+                "example": {
+                  "newEmail": "example@example.com",
+                  "newUsername": "example_user_name"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Updated Successfully"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Description of the specific error"
+                    }
+                  }
+                },
+                "examples": {
+                  "DataPointMissing": {
+                    "value": {
+                      "error": "At least one of newUsername or newEmail is required"
+                    }
+                  },
+                  "EmailError": {
+                    "value": {
+                      "error": "Incorrect Email format"
+                    }
+                  },
+                  "UsernameError": {
+                    "value": {
+                      "error": "Username must be at least 3 characters long"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "The server has encountered a situation it does not know how to handle."
+          }
+        }
+      }
+    },
+    "/api/user/updatePassword/": {
+      "put": {
+        "tags": ["User"],
+        "summary": "Update user password when he logged in",
+        "security": [{ "JWT": {} }],
+        "description": "Update user password when he logged in",
+        "requestBody": {
+          "description": "Pass user's old password and new password",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "newPassword": {
+                    "type": "string"
+                  },
+                  "oldPassword": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "newPassword": "newPassword",
+                  "oldPassword": "oldPassword"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Password Updated Successfully"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Description of the specific error"
+                    }
+                  }
+                },
+                "examples": {
+                  "OldPasswordIncorrect": {
+                    "value": {
+                      "error": "Old password entered was not correct"
+                    }
+                  },
+                  "NewPasswordNotValid": {
+                    "value": {
+                      "error": "Password must be at least 8 characters long and contain at least 1 special character"
+                    }
+                  },
+                  "PasswordUpdateUnsuccessful": {
+                    "value": {
+                      "error": "Password updation not successful"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/forgetPassword/": {
+      "put": {
+        "tags": ["User"],
+        "summary": "Reset Password by sending mail to registered user",
+
+        "description": "User can reset password without logging in by using otp, OTP will be only valid for 15 minutes",
+        "requestBody": {
+          "description": "By passing only email field and not otp in body will trigger the OTP to the registered mail",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "otp": {
+                    "type": ["string", " null"],
+                    "description": "Pass this after otp is triggred to mail"
+                  },
+                  "newPassword": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "newPassword": "newPassword",
+                  "userOtp": "123456",
+                  "email": "example@example.com"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "OTP sent" },
+          "201": {
+            "description": "Password Updated Successfully"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Description of the specific error"
+                    }
+                  }
+                },
+                "examples": {
+                  "ExpiredOTP": {
+                    "value": {
+                      "error": "OTP has expired, request for new otp"
+                    }
+                  },
+                  "NewPasswordNotValid": {
+                    "value": {
+                      "error": "Password must be at least 8 characters long and contain at least 1 special character"
+                    }
+                  },
+                  "EmailDoesNotExists": {
+                    "value": {
+                      "error": "User does not exists with this email"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "OTP did not match"
+          }
+        }
+      }
+    },
+
+    "/api/user/fetchUserCourse/": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Fetch courses in which user have enrolled",
+        "security": [{ "JWT": {} }],
+        "description": "Fetch courses in which user have enrolled",
+
+        "responses": {
+          "200": {
+            "description": "Array of course_id in which user have enrolled"
+          },
+          "401": {
+            "description": "User not logged in"
+          }
+        }
+      }
+    },
+    "/api/user/addCourse/": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Enroll user in a course based on courseId",
+        "security": [{ "JWT": {} }],
+        "description": "Fetch courses in which user have enrolled",
+        "requestBody": {
+          "description": "Pass courseId in request body to enroll the logged in user in that course",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "courseId": {
+                    "type": "number"
+                  }
+                },
+                "example": {
+                  "courseId": 1
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User successfuly enrolled to the course"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Description of the specific error"
+                    }
+                  }
+                },
+                "examples": {
+                  "CourseDoNotExists": {
+                    "value": {
+                      "error": "Course with passed courseId donot exists"
+                    }
+                  },
+                  "UserAlreadyEnrolled": {
+                    "value": {
+                      "error": "User is already enrolled in the course"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "User not logged in"
+          }
+        }
+      }
+    },
+    "/api/course/getCourse": {
+      "get": {
+        "tags": ["Courses"],
+        "summary": "Fetch all the courses which are in database - this has been declared as post method here - as swagger do not allow request body in get method",
+        "description": "Pagination is enballed - user can pass limit and offset in request body for activating pagination, in case limit is not passed requets will return all the courses",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "required": false,
+            "description": "pass limit to limit the numbers of record returned"
+          },
+          {
+            "in": "path",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            },
+            "required": false,
+            "description": "pass offset for pagination"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of courses present in the database"
+          },
+          "401": {
+            "description": "User not logged in"
+          }
+        }
+      }
+    },
+    "/api/course/insertCourse/": {
+      "post": {
+        "tags": ["Courses"],
+        "summary": "Add Courses in the database - Only user with superAdmin access is allowed to do so",
+        "description": "A user is made superAdmin manually from database end",
+        "requestBody": {
+          "description": "pass the details of the course - all the feilds are mandatory",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "course_name": {
+                    "type": "string"
+                  },
+                  "instructor": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "price": {
+                    "type": "number"
+                  },
+                  "level": {
+                    "type": "number"
+                  },
+                  "category": {
+                    "type": "string"
+                  },
+                  "popularity": {
+                    "type": "number"
+                  }
+                },
+                "example": {
+                  "course_name": "React JS by SS",
+                  "instructor": "SS",
+                  "description": "React JS by SS",
+                  "price": "100",
+                  "level": "6",
+                  "category": "IT",
+                  "popularity": "10"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Course Added successfuly"
+          },
+          "401": {
+            "description": "This request can only be made by super admin"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Description of the specific error"
+                    }
+                  }
+                },
+                "examples": {
+                  "CourseNameInvalid": {
+                    "value": {
+                      "error": "CourseNameInvalid"
+                    }
+                  },
+                  "InstructorNameInvalid": {
+                    "value": {
+                      "error": "InstructorNameInvalid"
+                    }
+                  },
+                  "DescriptionIsInvalid": {
+                    "value": {
+                      "error": "DescriptionIsInvalid"
+                    }
+                  },
+                  "priceIsInvalid": {
+                    "value": {
+                      "error": "price is invalid"
+                    }
+                  },
+                  "LevelIsInvalid": {
+                    "value": {
+                      "error": "LevelIsInvalid"
+                    }
+                  },
+                  "categoryIsInvalid": {
+                    "value": {
+                      "error": "categoryIsInvalid"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
